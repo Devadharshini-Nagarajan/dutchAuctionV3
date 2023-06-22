@@ -22,22 +22,22 @@
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>12/12</span>
+        <span class='fraction'>11/11</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">83.33% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>10/12</span>
+        <span class='fraction'>8/8</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>3/3</span>
+        <span class='fraction'>2/2</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>24/24</span>
+        <span class='fraction'>22/22</span>
       </div>
     </div>
   </div>
@@ -102,7 +102,9 @@
 57
 58
 59
-60</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+60
+61
+62</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -126,34 +128,36 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
 <span class="cline-any cline-yes">5×</span>
 <span class="cline-any cline-yes">4×</span>
-<span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3×</span>
 <span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-yes">3×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-yes">3×</span>
 <span class="cline-any cline-yes">3×</span>
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-yes">2×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
@@ -167,14 +171,12 @@ pragma solidity ^0.8.0;
 &nbsp;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 &nbsp;
 contract NFTDutchAuction {
-    using Counters for Counters.Counter;
     using SafeMath for uint256;
 &nbsp;
-    IERC721 public NFT_address;
-    uint256 public NFT_id;
+    IERC721 public NFTAddress;
+    uint256 public NFTId;
     uint256 public auctionStartBlock;
     uint256 public reservePrice;
     uint256 public numBlocksAuctionOpen;
@@ -182,38 +184,42 @@ contract NFTDutchAuction {
     uint256 public initialPrice;
     uint256 public auctionEndBlock;
     address payable public owner;
-    bool private ended;
+    bool private isAuctionOver;
 &nbsp;
-    modifier isAuctionValid() {
-        require(msg.sender != owner, "owner can't bid");
-        require(ended == false, "auction is ended");
-        <span class="missing-if-branch" title="else path not taken" >E</span>require(block.timestamp &gt; auctionStartBlock, "auction is not started yet");
-        <span class="missing-if-branch" title="else path not taken" >E</span>require(block.timestamp &lt; auctionEndBlock, "auction is ended");
-        _;
-    }
-    constructor(address erc721TokenAddress, uint256 _nftTokenId,uint256 _reservePrice, uint256 _numBlocksAuctionOpen, uint256 _offerPriceDecrement) {
-        NFT_address = IERC721(erc721TokenAddress);
-        NFT_id = _nftTokenId;
+    constructor(
+        address erc721TokenAddress,
+        uint256 _nftTokenId,
+        uint256 _reservePrice,
+        uint256 _numBlocksAuctionOpen,
+        uint256 _offerPriceDecrement
+    ) {
+        NFTAddress = IERC721(erc721TokenAddress);
+        NFTId = _nftTokenId;
         reservePrice = _reservePrice;
         numBlocksAuctionOpen = _numBlocksAuctionOpen;
         offerPriceDecrement = _offerPriceDecrement;
-        initialPrice = reservePrice.add(numBlocksAuctionOpen.mul(offerPriceDecrement));
-        auctionStartBlock = block.timestamp;
-        auctionEndBlock = block.timestamp.add(_numBlocksAuctionOpen);
+        initialPrice = reservePrice.add(
+            numBlocksAuctionOpen.mul(offerPriceDecrement)
+        );
+        auctionStartBlock = block.number;
+        auctionEndBlock = block.number + numBlocksAuctionOpen;
         owner = payable(msg.sender);
-        ended = false;
-&nbsp;
+        isAuctionOver = false;
     }
 &nbsp;
-    function bid() isAuctionValid() public payable returns(address)  {
-        uint256 blockPassed = block.timestamp.sub(auctionStartBlock);
-        uint256 currentPrice = initialPrice.sub(blockPassed.mul(offerPriceDecrement));
-        if (msg.value &gt;= currentPrice){
-            NFT_address.safeTransferFrom(owner,msg.sender,NFT_id);
+    function placeBid() public payable returns (address) {
+        require(msg.sender != owner, "Owner can't bid");
+        require(isAuctionOver == false, "Auction is ended!");
+        require(block.number &lt;= auctionEndBlock, "Auction is ended!");
+&nbsp;
+        uint256 goneBlocks = auctionEndBlock - block.number;
+        uint256 currentPrice = initialPrice - goneBlocks * offerPriceDecrement;
+&nbsp;
+        if (msg.value &gt;= currentPrice) {
+            NFTAddress.safeTransferFrom(owner, msg.sender, NFTId);
             owner.transfer(msg.value);
-            ended = true;
-        }
-        else {
+            isAuctionOver = true;
+        } else {
             address payable bidder = payable(msg.sender);
             bidder.transfer(msg.value);
         }
@@ -226,7 +232,7 @@ contract NFTDutchAuction {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Feb 16 2023 16:25:38 GMT-0500 (Eastern Standard Time)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Jun 21 2023 20:47:46 GMT-0400 (Eastern Daylight Time)
 </div>
 </div>
 <script src="../prettify.js"></script>
