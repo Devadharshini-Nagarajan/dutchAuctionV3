@@ -7,13 +7,13 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 contract MyDutchNFT is ERC721 {
     using Counters for Counters.Counter;
 
-    Counters.Counter private _tokenIdCounter;
+    Counters.Counter private tokenCounter;
 
     constructor() ERC721("MyDutchNFT", "DNFT") {}
 
     function safeMint(address to) public {
-        _tokenIdCounter.increment();
-        uint256 tokenId = _tokenIdCounter.current();
+        tokenCounter.increment();
+        uint256 tokenId = tokenCounter.current();
         _safeMint(to, tokenId);
     }
 }
