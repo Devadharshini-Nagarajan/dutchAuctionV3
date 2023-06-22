@@ -10,7 +10,7 @@ async function increaseBlocks(numBlocks: number): Promise<void> {
 }
 
 describe("NFTDutchAuction", function () {
-  async function deployDutchNFT() {
+  async function deployMyDutchNFT() {
     const DutchNFT = await ethers.getContractFactory("MyDutchNFT");
     const dutch_nft = await DutchNFT.deploy();
     return { dutch_nft };
@@ -18,7 +18,7 @@ describe("NFTDutchAuction", function () {
 
   async function deployNFTDutchAuction() {
     const [owner, account1, account2, account3, account4, account5] = await ethers.getSigners();
-    const { dutch_nft } = await loadFixture(deployDutchNFT);
+    const { dutch_nft } = await loadFixture(deployMyDutchNFT);
     const nft_address = dutch_nft.address;
     await dutch_nft.connect(owner).safeMint(owner.address);
     const nft_id = 1;
@@ -65,7 +65,7 @@ describe("NFTDutchAuction", function () {
       expect(await basic_dutch_auction.offerPriceDecrement()).to.equal(offerPriceDecrement);
     });
 
-    it("check owner of token id 1", async function () {
+    it("Should have address for nft token id 1 as same as owner's address", async function () {
       const { owner, dutch_nft, nft_id } = await loadFixture(deployNFTDutchAuction);
       expect(await dutch_nft.ownerOf(nft_id)).to.equal(owner.address);
     });
@@ -96,7 +96,7 @@ describe("NFTDutchAuction", function () {
       );
     });
 
-    it("Buyers will bid lesser price and bid amount will be refunded", async function () {
+    it("Should reject a bid if price lesser and transfer back it to buyer", async function () {
       const { basic_dutch_auction, owner, account1, account2, account3, account4 } = await loadFixture(deployNFTDutchAuction);
       const bid1:any = await basic_dutch_auction.connect(account1).placeBid({value: '100'});
       const receipt1 = await bid1.wait()
@@ -104,7 +104,7 @@ describe("NFTDutchAuction", function () {
       expect(await account1.getBalance()).to.lessThan(ethers.utils.parseEther("10000").sub(gasSpent1))
     });
 
-    it("Buyer's bid will accepted and token transfered to buyer", async function () {
+    it("Should accept a valid bid and token transfered to buyer", async function () {
         const { dutch_nft,nft_id,basic_dutch_auction,owner, account1, account2, account3, account4 } = await loadFixture(deployNFTDutchAuction);
         const balance_before = await owner.getBalance();
         const bid3:any = await basic_dutch_auction.connect(account3).placeBid({value: '50000'});

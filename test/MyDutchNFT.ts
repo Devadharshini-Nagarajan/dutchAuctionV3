@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 
 describe("MyDutchNFT", function () {
-  async function deployDutchNFT() {
+  async function deployMyDutchNFT() {
     
     const [owner, account1, account2] = await ethers.getSigners();
 
@@ -15,20 +15,20 @@ describe("MyDutchNFT", function () {
 
   describe("Deployment", function () {
     it("Should set the right name", async function () {
-      const { dutch_nft, owner, account1 } = await loadFixture(deployDutchNFT);
+      const { dutch_nft, owner, account1 } = await loadFixture(deployMyDutchNFT);
       expect(await dutch_nft.name()).to.equal("MyDutchNFT");
     });
 
     it("Should set the right symbol", async function () {
-        const { dutch_nft, owner, account1 } = await loadFixture(deployDutchNFT);
+        const { dutch_nft, owner, account1 } = await loadFixture(deployMyDutchNFT);
   
         expect(await dutch_nft.symbol()).to.equal("DNFT");
     });
   });
 
 describe("Minting", function () {
-    it("Mint NFTs", async function () {
-        const { dutch_nft, owner, account1,account2 } = await loadFixture(deployDutchNFT);
+    it("Mint NFTs and cross verify owner address of NFT ids", async function () {
+        const { dutch_nft, owner, account1,account2 } = await loadFixture(deployMyDutchNFT);
         const mint1 = await dutch_nft.connect(account1).safeMint(account1.address);
         const mint2 = await dutch_nft.connect(account2).safeMint(account2.address);
         expect(await dutch_nft.ownerOf(1)).to.eq(account1.address)
