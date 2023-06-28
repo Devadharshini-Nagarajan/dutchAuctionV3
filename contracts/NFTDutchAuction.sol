@@ -47,7 +47,6 @@ contract NFTDutchAuction {
 
     function placeBid(uint256 _amount) public payable returns (address) {
         require(msg.sender != owner, "Owner can't bid");
-        require(isAuctionOver == false, "Auction is ended!");
         require(block.number <= auctionEndBlock, "Auction is ended!");
 
         uint256 goneBlocks = auctionEndBlock - block.number;
