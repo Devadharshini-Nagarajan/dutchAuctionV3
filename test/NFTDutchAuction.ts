@@ -119,5 +119,28 @@ describe("NFTDutchAuction", function () {
       );
     });
 
+    it("Should reject a bid if price lesser and transfer back it to buyer", async function () {
+      const { bid_token, basic_dutch_auction,owner, account1, account2, account3, account4 } = await loadFixture(deployNFTDutchAuction);
+      await bid_token.connect(account1).approve(basic_dutch_auction.address,1000);
+      const bidder_balance = await bid_token.balanceOf(account1.address)
+      await expect(basic_dutch_auction.connect(account1).placeBid('1000')).to.be.revertedWith(
+        "Lesser price"
+      );      
+      await bid_token.connect(account1).approve(basic_dutch_auction.address,0);
+      expect(await bid_token.balanceOf(account1.address)).to.equal(bidder_balance);
+    });
+
+    it("Should accept a valid bid and token transfered to buyer", async function () {
+      const { bid_token, dutch_nft,nft_id,basic_dutch_auction,owner, account1, account2, account3, account4 } = await loadFixture(deployNFTDutchAuction);
+        const balance_before = await owner.getBalance();
+        await bid_token.connect(account3).approve(basic_dutch_auction.address,50000);
+        const bidder_balance = await bid_token.balanceOf(account3.address);
+        const owner_balance = await bid_token.balanceOf(owner.address);
+        await basic_dutch_auction.connect(account3).placeBid('50000');
+        expect(await bid_token.balanceOf(account3.address)).to.eq(bidder_balance.sub("50000"))
+        expect (await bid_token.balanceOf(owner.address)).to.eq(owner_balance.add("50000"));
+        expect(await dutch_nft.ownerOf(nft_id)).to.equal(account3.address);
+  });
+
   })
 });

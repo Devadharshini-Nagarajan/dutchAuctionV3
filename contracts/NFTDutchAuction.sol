@@ -53,6 +53,8 @@ contract NFTDutchAuction {
         uint256 goneBlocks = auctionEndBlock - block.number;
         uint256 currentPrice = initialPrice - goneBlocks * offerPriceDecrement;
 
+        require(_amount >= currentPrice,"Lesser price");
+
         token_address.transferFrom(msg.sender,owner,_amount);
         NFTAddress.safeTransferFrom(owner, msg.sender, NFTId);
         isAuctionOver = true;
