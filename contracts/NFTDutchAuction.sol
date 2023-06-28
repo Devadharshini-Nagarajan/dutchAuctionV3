@@ -4,12 +4,15 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "./MyDutchNFT.sol";
+import "./MyERC20Token.sol";
 
 contract NFTDutchAuction {
     using SafeMath for uint256;
 
-    IERC721 public NFTAddress;
+    MyDutchNFT public NFTAddress;
     uint256 public NFTId;
+    MyERC20Token public token_address;
     uint256 public auctionStartBlock;
     uint256 public reservePrice;
     uint256 public numBlocksAuctionOpen;
@@ -20,13 +23,15 @@ contract NFTDutchAuction {
     bool private isAuctionOver;
 
     constructor(
+        address erc20TokenAddress,
         address erc721TokenAddress,
         uint256 _nftTokenId,
         uint256 _reservePrice,
         uint256 _numBlocksAuctionOpen,
         uint256 _offerPriceDecrement
     ) {
-        NFTAddress = IERC721(erc721TokenAddress);
+        token_address = MyERC20Token(erc20TokenAddress);
+        NFTAddress = MyDutchNFT(erc721TokenAddress);
         NFTId = _nftTokenId;
         reservePrice = _reservePrice;
         numBlocksAuctionOpen = _numBlocksAuctionOpen;
@@ -40,7 +45,7 @@ contract NFTDutchAuction {
         isAuctionOver = false;
     }
 
-    function placeBid() public payable returns (address) {
+    function placeBid(uint256 _amount) public payable returns (address) {
         require(msg.sender != owner, "Owner can't bid");
         require(isAuctionOver == false, "Auction is ended!");
         require(block.number <= auctionEndBlock, "Auction is ended!");
@@ -48,14 +53,10 @@ contract NFTDutchAuction {
         uint256 goneBlocks = auctionEndBlock - block.number;
         uint256 currentPrice = initialPrice - goneBlocks * offerPriceDecrement;
 
-        if (msg.value >= currentPrice) {
-            NFTAddress.safeTransferFrom(owner, msg.sender, NFTId);
-            owner.transfer(msg.value);
-            isAuctionOver = true;
-        } else {
-            address payable bidder = payable(msg.sender);
-            bidder.transfer(msg.value);
-        }
+        token_address.transferFrom(msg.sender,owner,_amount);
+        NFTAddress.safeTransferFrom(owner, msg.sender, NFTId);
+        isAuctionOver = true;
+       
         return msg.sender;
     }
 }

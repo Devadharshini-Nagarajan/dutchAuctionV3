@@ -22,12 +22,12 @@
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>11/11</span>
+        <span class='fraction'>8/8</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">100% </span>
+        <span class="strong">83.33% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>8/8</span>
+        <span class='fraction'>5/6</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
@@ -37,7 +37,7 @@
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>22/22</span>
+        <span class='fraction'>20/20</span>
       </div>
     </div>
   </div>
@@ -104,7 +104,12 @@
 59
 60
 61
-62</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+62
+63</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -138,6 +143,7 @@
 <span class="cline-any cline-yes">3×</span>
 <span class="cline-any cline-yes">3×</span>
 <span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3×</span>
@@ -147,22 +153,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6×</span>
-<span class="cline-any cline-yes">5×</span>
-<span class="cline-any cline-yes">4×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">//SPDX-License-Identifier: UNLICENSED
@@ -171,12 +173,15 @@ pragma solidity ^0.8.0;
 &nbsp;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "./MyDutchNFT.sol";
+import "./MyERC20Token.sol";
 &nbsp;
 contract NFTDutchAuction {
     using SafeMath for uint256;
 &nbsp;
-    IERC721 public NFTAddress;
+    MyDutchNFT public NFTAddress;
     uint256 public NFTId;
+    MyERC20Token public token_address;
     uint256 public auctionStartBlock;
     uint256 public reservePrice;
     uint256 public numBlocksAuctionOpen;
@@ -187,13 +192,15 @@ contract NFTDutchAuction {
     bool private isAuctionOver;
 &nbsp;
     constructor(
+        address erc20TokenAddress,
         address erc721TokenAddress,
         uint256 _nftTokenId,
         uint256 _reservePrice,
         uint256 _numBlocksAuctionOpen,
         uint256 _offerPriceDecrement
     ) {
-        NFTAddress = IERC721(erc721TokenAddress);
+        token_address = MyERC20Token(erc20TokenAddress);
+        NFTAddress = MyDutchNFT(erc721TokenAddress);
         NFTId = _nftTokenId;
         reservePrice = _reservePrice;
         numBlocksAuctionOpen = _numBlocksAuctionOpen;
@@ -207,22 +214,18 @@ contract NFTDutchAuction {
         isAuctionOver = false;
     }
 &nbsp;
-    function placeBid() public payable returns (address) {
+    function placeBid(uint256 _amount) public payable returns (address) {
         require(msg.sender != owner, "Owner can't bid");
-        require(isAuctionOver == false, "Auction is ended!");
+        <span class="missing-if-branch" title="else path not taken" >E</span>require(isAuctionOver == false, "Auction is ended!");
         require(block.number &lt;= auctionEndBlock, "Auction is ended!");
 &nbsp;
         uint256 goneBlocks = auctionEndBlock - block.number;
         uint256 currentPrice = initialPrice - goneBlocks * offerPriceDecrement;
 &nbsp;
-        if (msg.value &gt;= currentPrice) {
-            NFTAddress.safeTransferFrom(owner, msg.sender, NFTId);
-            owner.transfer(msg.value);
-            isAuctionOver = true;
-        } else {
-            address payable bidder = payable(msg.sender);
-            bidder.transfer(msg.value);
-        }
+        token_address.transferFrom(msg.sender,owner,_amount);
+        NFTAddress.safeTransferFrom(owner, msg.sender, NFTId);
+        isAuctionOver = true;
+       
         return msg.sender;
     }
 }
@@ -232,7 +235,7 @@ contract NFTDutchAuction {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Jun 21 2023 21:15:14 GMT-0400 (Eastern Daylight Time)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Jun 28 2023 18:33:27 GMT-0400 (Eastern Daylight Time)
 </div>
 </div>
 <script src="../prettify.js"></script>
